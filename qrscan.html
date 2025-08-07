@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        .scan-line {
+            animation: scan-line 2s linear infinite;
+        }
+        @keyframes scan-line {
+            0% { top: 0; }
+            50% { top: 100%; }
+            50.1% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
+    
+    <header class="w-full max-w-md flex justify-between items-center py-4">
+        <h1 class="text-xl font-bold">QR Scanner</h1>
+        <button id="toggle-camera" class="text-gray-400 hover:text-white transition">
+            <i class="fas fa-camera-rotate text-lg"></i>
+        </button>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center w-full max-w-md mt-8">
+        <p class="text-gray-400 mb-4 text-center">Center the QR code in the frame</p>
+        <div id="scanner-container" class="relative w-full aspect-square border-2 border-blue-500 rounded-xl overflow-hidden shadow-lg">
+            <div id="reader" class="w-full h-full"></div>
+            <div class="absolute inset-0 border-4 border-blue-500 rounded-xl pointer-events-none"></div>
+            <div class="scan-line absolute w-full h-1 bg-blue-500 shadow-glow pointer-events-none"></div>
+        </div>
+    </main>
+
+    <div id="status-toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 bg-gray-800 rounded-lg shadow-xl text-center hidden">
+        <p id="toast-message"></p>
+    </div>
+    <div>
+        <p id="toast-paragraph"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let html5QrcodeScanner;
+            let currentCameraId = null;
+            let cameras = [];
+            const reader = document.getElementById('reader');
+            const toggleButton = document.getElementById('toggle-camera');
+            const toast = document.getElementById('status-toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastParagraph = document.getElementById('toast-paragraph');
+
+            // Function to handle successful scan
+            const onScanSuccess = async (decodedText, decodedResult) => {
+                console.log(`Scan successful: ${decodedText}`);
+                showToast(`QR code scanned: ${decodedText}`);
+                
+                // Implement your logic for handling the scanned data here
+                try {
+                    console.log("Marking attendance for ID:", decodedText);
+                    console.log(decodedText.id);
+                    const jsonString = decodedText;
+                    console.log("JSON String:", jsonString);
+                    const userObject = JSON.parse(jsonString);
+                    const userId = userObject.id;
+                    console.log("User ID:", userId);
+
+                    const response = await fetch("http://localhost:4000/api/User/attendance/mark", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            id: userId 
+                        })
+                    });
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok'); 
+                }
+                    const result = await response.json();
+
+                    if (result.success) {
+                        toastMessage.textContent =  result.message;
+                        toastParagraph.textContent = result.message;
+                        showToast(result.message);
+                        closeCamera();
+                    } else if (result.error) {
+                        showToast(result.error);
+                        closeCamera();
+
+                    } else {
+                        showToast("Failed to mark attendance. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Error marking attendance:", error);
+                     showToast("Error marking attendance. Please try again.");
+                };
+            };
+
+    
+
+            // Function to handle camera access error
+            const onScanFailure = (error) => {
+                console.warn(`Scan failure: ${error}`);
+                // This is normal during scanning and can be ignored
+            };
+
+            // Function to start the QR scanner
+            const startScanner = (cameraId) => {
+                if (html5QrcodeScanner) {
+                    html5QrcodeScanner.stop().catch(err => console.error("Failed to stop scanner", err));
+                }
+                html5QrcodeScanner = new Html5Qrcode("reader");
+                html5QrcodeScanner.start(
+                    cameraId,
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.error("Failed to start scanner", err);
+                    showToast("Error: Camera access failed.");
+                });
+            };
+
+            // Function to switch between cameras
+            const switchCamera = () => {
+                const currentIndex = cameras.findIndex(cam => cam.id === currentCameraId);
+                const nextIndex = (currentIndex + 1) % cameras.length;
+                currentCameraId = cameras[nextIndex].id;
+                startScanner(currentCameraId);
+            };
+
+            // Function to show toast notifications
+            const showToast = (message) => {
+                toastMessage.textContent = message;
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            };
+
+            // Initialize the app
+            Html5Qrcode.getCameras().then(cameraList => {
+                if (cameraList && cameraList.length) {
+                    cameras = cameraList;
+                    currentCameraId = cameras[0].id;
+                    startScanner(currentCameraId);
+                    if (cameras.length > 1) {
+                        toggleButton.onclick = switchCamera;
+                        toggleButton.style.display = 'block';
+                    }
+                } else {
+                    showToast("No camera found.");
+                    toggleButton.style.display = 'none';
+                }
+            }).catch(err => {
+                console.error("Error getting cameras", err);
+                showToast("Error: Cannot access cameras.");
+            });
+        });
+    </script>
+
+</body>
+</html>

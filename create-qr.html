@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student ID Card Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7ff;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wizard-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .wizard-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wizard-header h1 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .wizard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: 1;
+        }
+
+        .wizard-steps {
+            display: flex;
+            padding: 20px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .wizard-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 3px;
+            background: var(--light-gray);
+            z-index: 0;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 15px;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+            border: 3px solid white;
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .wizard-content {
+            padding: 30px;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-content h2 {
+            margin-bottom: 25px;
+            color: var(--primary);
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .step-content h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .prev-btn {
+            background: var(--light-gray);
+            color: var(--gray);
+        }
+
+        .prev-btn:hover {
+            background: #d1d7e0;
+        }
+
+        .next-btn, .generate-btn {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .next-btn:hover, .generate-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--accent));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .photo-preview {
+            border: 2px dashed var(--light-gray);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            background: var(--light);
+        }
+
+        .photo-preview:hover {
+            border-color: var(--accent);
+        }
+
+        .photo-preview p {
+            color: var(--gray);
+            margin-bottom: 0;
+        }
+
+        .photo-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            display: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        /* ID Card Styles */
+        #idCardContainer {
+            display: none;
+            margin: 40px auto;
+            perspective: 1000px;
+            max-width: 100%;
+        }
+
+        #idCard {
+            width: 100%;
+            max-width: 600px;
+            min-height: 350px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        #idCard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
+        .id-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .id-header h2 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .id-header p {
+            color: var(--gray);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .id-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-grow: 1;
+            gap: 20px;
+        }
+
+        .id-photo {
+            flex-shrink: 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .id-photo::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            z-index: -1;
+        }
+
+        .id-photo img {
+            width: 150px;
+            height: 180px;
+            border-radius: var(--border-radius);
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .id-details {
+            flex-grow: 1;
+            padding: 0 15px;
+        }
+
+        .detail-row {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--light-gray);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 100px;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            background: white;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--light-gray);
+        }
+
+        .id-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .id-card-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0.05;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .actions {
+            display: none;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .download-btn {
+            background: linear-gradient(to right, var(--success), #4cc9f0);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 201, 240, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 201, 240, 0.4);
+        }
+
+        .print-btn {
+            background: linear-gradient(to right, var(--warning), #f8961e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(248, 150, 30, 0.3);
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(248, 150, 30, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .wizard-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .step {
+                width: 35px;
+                height: 35px;
+                margin: 0 10px;
+            }
+            
+            .id-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .id-details {
+                width: 100%;
+                padding: 20px 0 0 0;
+            }
+            
+            .id-photo {
+                margin-bottom: 20px;
+            }
+            
+            .id-photo img {
+                width: 120px;
+                height: 150px;
+            }
+            
+            .qr-code {
+                width: 80px;
+                height: 80px;
+            }
+            
+            #idCard {
+                min-height: auto;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wizard-content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Ensure landscape orientation */
+        @media (orientation: portrait) {
+            #idCard {
+                transform: rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wizard-container">
+            <div class="wizard-header">
+                <h1>Student ID Card Generator</h1>
+            </div>
+            
+            <div class="wizard-steps">
+                <div class="step active" data-step="1">1</div>
+                <div class="step" data-step="2">2</div>
+                <div class="step" data-step="3">3</div>
+            </div>
+            
+            <div class="wizard-content">
+                <!-- Step 1: Personal Info -->
+                <div class="step-content active" data-step="1">
+                    <h2>Personal Information</h2>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" required placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" required placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <input type="text" id="course" required placeholder="Enter course of study">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <input type="text" id="role" required placeholder="Enter role">
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="next-btn">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Upload Photo -->
+                <div class="step-content" data-step="2">
+                    <h2>Upload Photo</h2>
+                    <div class="form-group">
+                        <label for="photo">Student Photo</label>
+                        <input type="file" id="photo" accept="image/*" required>
+                    </div>
+                    <div class="photo-preview">
+                        <p>No photo selected</p>
+                        <img id="photoPreview" src="" alt="Preview">
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="prev-btn">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="next-btn">
+                            <i class="fas fa-arrow-right"></i> Next
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Generate -->
+                <div class="step-content" data-step="3">
+                    <h2>Generate ID Card</h2>
+                    <div id="reviewInfo" style="background: var(--light); padding: 20px; border-radius: var(--border-radius); margin-bottom: 20px;"></div>
+                    <div class="button-group">
+                        <button type="button" class="prev-btn">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="generate-btn">
+                            <i class="fas fa-id-card"></i> Generate ID Card
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ID Card Display -->
+        <div id="idCardContainer">
+            <div id="idCard">
+                <svg class="id-card-bg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path fill="var(--primary)" fill-opacity="0.1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+                </svg>
+                
+                <div class="id-header">
+                    <h2>NASCOMSOFT EMBEDDED</h2>
+                    <p id="cardProgram">Computer Science</p>
+                </div>
+                
+                <div class="id-body">
+                    <div class="id-photo">
+                        <img id="cardPhoto" src="" alt="Student Photo">
+                    </div>
+                    
+                    <div class="id-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span id="cardName" class="detail-value">John Doe</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Student ID:</span>
+                            <span id="cardId" class="detail-value">STU-20230001</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Program:</span>
+                            <span id="cardProgramText" class="detail-value">Computer Science</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Valid Until:</span>
+                            <span id="cardExpiry" class="detail-value">Dec 2025</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="id-footer">
+                    <div id="qrCode" class="qr-code"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions" id="cardActions">
+            <button class="action-btn download-btn" id="downloadBtn">
+                <i class="fas fa-download"></i> Download ID
+            </button>
+            <button class="action-btn print-btn" id="printBtn">
+                <i class="fas fa-print"></i> Print ID
+            </button>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Wizard navigation
+    const steps = document.querySelectorAll('.step-content');
+    const stepIndicators = document.querySelectorAll('.step');
+    let currentStep = 1;
+
+    // Show current step
+    function showStep(step) {
+        steps.forEach(s => s.classList.remove('active'));
+        stepIndicators.forEach(s => s.classList.remove('active'));
+
+        document.querySelector(`.step-content[data-step="${step}"]`).classList.add('active');
+        document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+
+        currentStep = step;
+    }
+
+    // Next button
+    document.querySelectorAll('.next-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (validateStep(currentStep)) {
+                if (currentStep === 2) {
+                    updateReview();
+                }
+                showStep(currentStep + 1);
+            }
+        });
+    });
+
+    // Previous button
+    document.querySelectorAll('.prev-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            showStep(currentStep - 1);
+        });
+    });
+
+    // Validate step
+    function validateStep(step) {
+        let valid = true;
+        const currentStepEl = document.querySelector(`.step-content[data-step="${step}"]`);
+
+        const inputs = currentStepEl.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = 'var(--danger)';
+                valid = false;
+
+                input.addEventListener('input', function() {
+                    if (input.value.trim()) {
+                        input.style.borderColor = 'var(--light-gray)';
+                    }
+                });
+            }
+        });
+
+        if (step === 2 && !document.getElementById('photo').files[0]) {
+            alert('Please upload a photo');
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    // Photo preview
+    document.getElementById('photo').addEventListener('change', function(e) {
+        if (e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('photoPreview');
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+                preview.previousElementSibling.style.display = 'none';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // Update review section
+    function updateReview() {
+        const review = `
+            <p><strong>Name:</strong> ${document.getElementById('firstName').value} ${document.getElementById('lastName').value}</p>
+            <p><strong>Program:</strong> ${document.getElementById('course').value}</p>
+        `;
+        document.getElementById('reviewInfo').innerHTML = review;
+    }
+
+    // Generate ID Card and Register Student
+    document.querySelector('.generate-btn').addEventListener('click', async function() {
+        if (validateStep(currentStep)) {
+            // Set card data
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const course = document.getElementById('course').value;
+            const email = document.getElementById('email').value;
+            const Role = document.getElementById('role').value;
+
+            
+            const fullName = `${firstName} ${lastName}`;
+
+            document.getElementById('cardName').textContent = fullName;
+            document.getElementById('cardProgram').textContent = course;
+            document.getElementById('cardProgramText').textContent = course;
+
+            // Generate student ID
+            const studentId = 'STU-' + new Date().getFullYear() +
+                Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('cardId').textContent = studentId;
+
+            // Set expiry date (2 years from now)
+            const now = new Date();
+            const expiry = new Date(now.setFullYear(now.getFullYear() + 2));
+            document.getElementById('cardExpiry').textContent =
+                `${expiry.toLocaleString('default', { month: 'short' })} ${expiry.getFullYear()}`;
+
+            // Set photo
+            if (document.getElementById('photo').files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('cardPhoto').src = event.target.result;
+                };
+                reader.readAsDataURL(document.getElementById('photo').files[0]);
+            }
+            
+            // **NEW: API CALL TO REGISTER THE STUDENT**
+            try {
+                const response = await fetch("http://localhost:4000/api/admin/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: fullName,
+                        studentId: studentId,
+                        email: email,
+                        course: course,
+                        role: Role
+                    })
+                });
+
+                if (!response.ok) {
+                    // Handle API error, e.g., show an alert or error message on the page
+                    const errorData = await response.json();
+                    alert(`Registration failed: ${errorData.message}`);
+                    return;
+                }
+
+                const result = await response.json();
+                console.log("Registration successful:", result);
+
+            } catch (error) {
+                // Handle network or other errors
+                console.error("Error during student registration:", error);
+                alert("Failed to register student. Please check your network and try again.");
+                return;
+            }
+
+            // Generate QR code
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            const qrData = JSON.stringify({
+                name: fullName,
+                id: studentId
+            });
+            new QRCode(qrContainer, {
+                text: qrData,
+                width: 80,
+                height: 80,
+                colorDark: "#1a1a2e",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Show ID card
+            document.getElementById('idCardContainer').style.display = 'block';
+            document.getElementById('cardActions').style.display = 'flex';
+
+            // Scroll to card with animation
+            setTimeout(() => {
+                document.getElementById('idCardContainer').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Add animation to card
+                document.getElementById('idCard').style.transform = 'rotateY(10deg)';
+                setTimeout(() => {
+                    document.getElementById('idCard').style.transform = 'rotateY(0)';
+                }, 500);
+            }, 100);
+        }
+    });
+
+    // Download button
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+
+       html2canvas(document.getElementById('idCard')).then(function(canvas) {
+           const link = document.createElement('a');
+           link.href = canvas.toDataURL('image/png');
+           link.download = 'id_card.png';
+           link.click();
+       });
+    });
+
+    // Print button
+    document.getElementById('printBtn').addEventListener('click', function() {
+        const originalContent = document.body.innerHTML;
+        const printContent = document.getElementById('idCard').outerHTML;
+
+        document.body.innerHTML = `
+            <style>
+                @page { size: landscape; }
+                body {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    padding: 20px;
+                    background: white !important;
+                }
+                #idCard {
+                    box-shadow: none !important;
+                    border: 1px solid #ddd !important;
+                    transform: none !important;
+                }
+            </style>
+            ${printContent}
+            <script>
+                setTimeout(() => {
+                    window.print();
+                    setTimeout(() => {
+                        document.body.innerHTML = originalContent;
+                        window.location.reload();
+                    }, 500);
+                }, 500);
+            <\/script>
+        `;
+    });
+});
+    </script>
+   
+</body>
+</html>
