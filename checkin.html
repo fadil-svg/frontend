@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkin Page</title>
+  <style>
+    body {
+      background-color: #0a1e32;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .center-main {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      color: #222;
+      display:none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+      animation: fadeInZoom 0.5s;
+    }
+    @keyframes fadeInZoom {
+      from { opacity: 0; transform: scale(0.95);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 2rem 1.5rem 1rem 1.5rem;
+      background: #f8fafc;
+    }
+    .card-header svg {
+      color: green;
+      margin-bottom: 1rem;
+    }
+    .headline {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .card-body {
+      text-align: center;
+      padding: 2rem 2rem 2rem 2rem;
+    }
+    .muted {
+      font-weight:bolder;
+      font-size: 1.125rem;
+    }
+    @media (max-width: 500px) {
+      .card {
+        max-width: 95vw;
+      }
+      .card-body, .card-header {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="center-main">
+    <div class="card">
+      <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-24 h-24 text-primary mb-4"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+        <div class="headline">Welcome</div>
+      </div>
+      <div class="card-body">
+        <p class="muted">You have successfully checked in at </p>
+      </div>
+      
+
+  </div>
+ 
+</main>
+
+  <script>
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('name') || 'Guest';
+
+
+  // function names(){
+    const names = ['Fadil', 'Hoseah', 'Zipporah', 'Taofeeq'];
+  //   return names;
+  // }
+  
+document.addEventListener('DOMContentLoaded', () => {
+
+    const headline = document.querySelector('.headline');
+    const card = document.querySelector('.card');
+    const muted = document.querySelector('.muted');
+
+  if (names.includes(name)) {
+      document.title = `Checkin - ${name}`;
+      headline.textContent = `✅ Welcome, ${name}!`
+      muted.textContent = `You have successfully checked in.`;
+      headline.style.display = 'block';
+      card.style.display = 'block';
+
+      if (timeElement) {
+        timeElement.textContent = `Check-in Time: ${currentTime}`;
+      }
+
+  } else {
+     window.location.href = "not-eligible.html";
+
+
+  }
+});
+
+  
+</script>
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const card = document.querySelector('.card');
+      card.style.display = 'block';
+    });
+  </script> -->
+</body>
+</html>

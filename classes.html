@@ -198,29 +198,23 @@
                     <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <div>
-                                <label class="text-xs text-gray-500 block mb-1" contenteditable="false">Academic Year</label>
+                                <label class="text-xs text-gray-500 block mb-1" contenteditable="false">Year</label>
                                 <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 w-full">
+                                    <option>2024/2025</option>
                                     <option>2023/2024</option>
                                     <option>2022/2023</option>
-                                    <option>2021/2022</option>
                                 </select>
                             </div>
+                           
                             <div>
-                                <label class="text-xs text-gray-500 block mb-1" contenteditable="false">Term</label>
+                                <label class="text-xs text-gray-500 block mb-1" contenteditable="false">Courses</label>
                                 <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 w-full">
-                                    <option>All Terms</option>
-                                    <option>First Term</option>
-                                    <option>Second Term</option>
-                                    <option>Third Term</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-500 block mb-1" contenteditable="false">Grade Level</label>
-                                <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 w-full">
-                                    <option>All Grades</option>
-                                    <option>Grade 10</option>
-                                    <option>Grade 11</option>
-                                    <option>Grade 12</option>
+                                    <option>All Courses</option>
+                                    <option>Web Development</option>
+                                    <option>App Development</option>
+                                    <option>Embedded Systems</option>
+                                    <option>Graphics Design</option>
+                                    <option>Cyber Security</option>
                                 </select>
                             </div>
                         </div>
@@ -260,7 +254,29 @@
                             </div>
                         </div>
                     </div>
+                    <div id="form" style="margin-top:20px;">
+                     <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4" contenteditable="false">Instructors</th>
+                                    <th class="p-4" contenteditable="false">Classes</th>
+                                    <th class="p-4" contenteditable="false">Students</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody id="timetable-body" class="divide-y divide-gray-200 bg-white">
+                              
+                            </tbody>
+                        </table>
+
+                    </div>
                     
+
+                            <tbody id="timetable-body" class="divide-y divide-gray-200 bg-white">
+                                <!-- Timetable rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
                     <!-- Timetable -->
                     <div id="timetable" class="overflow-x-auto section-clickable">
                         <table class="min-w-full">
@@ -284,154 +300,152 @@
         </div>
     </div>
 
-    <script>
-        // Mock data for classes
-        const classesData = [
-            {
-                id: "class-10-a",
-                name: "Class 10-A",
-                grade: "Grade 10",
-                teacher: "Mr. Johnson",
-                students: 28,
-                room: "Room 101",
-                color: "bg-blue-100 text-blue-800"
-            },
-            {
-                id: "class-10-b",
-                name: "Class 10-B",
-                grade: "Grade 10",
-                teacher: "Ms. Williams",
-                students: 25,
-                room: "Room 102",
-                color: "bg-green-100 text-green-800"
-            },
-            {
-                id: "class-11-a",
-                name: "Class 11-A",
-                grade: "Grade 11",
-                teacher: "Mr. Brown",
-                students: 30,
-                room: "Room 201",
-                color: "bg-yellow-100 text-yellow-800"
-            },
-            {
-                id: "class-11-b",
-                name: "Class 11-B",
-                grade: "Grade 11",
-                teacher: "Ms. Davis",
-                students: 27,
-                room: "Room 202",
-                color: "bg-purple-100 text-purple-800"
-            },
-            {
-                id: "class-12-a",
-                name: "Class 12-A",
-                grade: "Grade 12",
-                teacher: "Mr. Wilson",
-                students: 32,
-                room: "Room 301",
-                color: "bg-red-100 text-red-800"
-            },
-            {
-                id: "class-12-b",
-                name: "Class 12-B",
-                grade: "Grade 12",
-                teacher: "Ms. Taylor",
-                students: 29,
-                room: "Room 302",
-                color: "bg-indigo-100 text-indigo-800"
-            }
-        ];
 
-        // Mock data for timetable
-        const timetableData = {
-            "class-10-a": [
-                {
-                    time: "08:00 - 09:00",
-                    monday: "Mathematics (Mr. Johnson)",
-                    tuesday: "English (Ms. Smith)",
-                    wednesday: "Science (Mr. Brown)",
-                    thursday: "Mathematics (Mr. Johnson)",
-                    friday: "History (Ms. Davis)"
-                },
-                {
-                    time: "09:00 - 10:00",
-                    monday: "English (Ms. Smith)",
-                    tuesday: "Science (Mr. Brown)",
-                    wednesday: "Mathematics (Mr. Johnson)",
-                    thursday: "Physical Education (Mr. Wilson)",
-                    friday: "Science (Mr. Brown)"
-                },
-                {
-                    time: "10:00 - 10:30",
-                    monday: "Break",
-                    tuesday: "Break",
-                    wednesday: "Break",
-                    thursday: "Break",
-                    friday: "Break"
-                },
-                {
-                    time: "10:30 - 11:30",
-                    monday: "History (Ms. Davis)",
-                    tuesday: "Mathematics (Mr. Johnson)",
-                    wednesday: "English (Ms. Smith)",
-                    thursday: "Science (Mr. Brown)",
-                    friday: "Mathematics (Mr. Johnson)"
-                },
-                {
-                    time: "11:30 - 12:30",
-                    monday: "Science (Mr. Brown)",
-                    tuesday: "Physical Education (Mr. Wilson)",
-                    wednesday: "Art (Ms. Taylor)",
-                    thursday: "English (Ms. Smith)",
-                    friday: "Physical Education (Mr. Wilson)"
-                },
-                {
-                    time: "12:30 - 13:30",
-                    monday: "Lunch",
-                    tuesday: "Lunch",
-                    wednesday: "Lunch",
-                    thursday: "Lunch",
-                    friday: "Lunch"
-                },
-                {
-                    time: "13:30 - 14:30",
-                    monday: "Art (Ms. Taylor)",
-                    tuesday: "History (Ms. Davis)",
-                    wednesday: "Physical Education (Mr. Wilson)",
-                    thursday: "Art (Ms. Taylor)",
-                    friday: "English (Ms. Smith)"
-                },
-                {
-                    time: "14:30 - 15:30",
-                    monday: "Physical Education (Mr. Wilson)",
-                    tuesday: "Art (Ms. Taylor)",
-                    wednesday: "History (Ms. Davis)",
-                    thursday: "History (Ms. Davis)",
-                    friday: "Art (Ms. Taylor)"
-                }
-            ],
-            "class-10-b": [
-                // Similar structure for Class 10-B
-                // ...
-            ],
-            "class-11-a": [
-                // Similar structure for Class 11-A
-                // ...
-            ],
-            "class-11-b": [
-                // Similar structure for Class 11-B
-                // ...
-            ],
-            "class-12-a": [
-                // Similar structure for Class 12-A
-                // ...
-            ],
-            "class-12-b": [
-                // Similar structure for Class 12-B
-                // ...
-            ]
-        };
+    <script>
+        // // Mock data for classes
+        // const classesData = [
+        //     {
+        //         id: "1st",
+        //         name: "Web Development",
+        //         instructor: "Mr. Johnson",
+        //         color: "bg-blue-100 text-blue-800"
+        //     },
+        //     {
+        //         id: "class-10-b",
+        //         name: "Class 10-B",
+        //         grade: "Grade 10",
+        //         teacher: "Ms. Williams",
+        //         students: 25,
+        //         room: "Room 102",
+        //         color: "bg-green-100 text-green-800"
+        //     },
+        //     {
+        //         id: "class-11-a",
+        //         name: "Class 11-A",
+        //         grade: "Grade 11",
+        //         teacher: "Mr. Brown",
+        //         students: 30,
+        //         room: "Room 201",
+        //         color: "bg-yellow-100 text-yellow-800"
+        //     },
+        //     {
+        //         id: "class-11-b",
+        //         name: "Class 11-B",
+        //         grade: "Grade 11",
+        //         teacher: "Ms. Davis",
+        //         students: 27,
+        //         room: "Room 202",
+        //         color: "bg-purple-100 text-purple-800"
+        //     },
+        //     {
+        //         id: "class-12-a",
+        //         name: "Class 12-A",
+        //         grade: "Grade 12",
+        //         teacher: "Mr. Wilson",
+        //         students: 32,
+        //         room: "Room 301",
+        //         color: "bg-red-100 text-red-800"
+        //     },
+        //     {
+        //         id: "class-12-b",
+        //         name: "Class 12-B",
+        //         grade: "Grade 12",
+        //         teacher: "Ms. Taylor",
+        //         students: 29,
+        //         room: "Room 302",
+        //         color: "bg-indigo-100 text-indigo-800"
+        //     }
+        // ];
+
+        // // Mock data for timetable
+        // const timetableData = {
+        //     "class-10-a": [
+        //         {
+        //             time: "08:00 - 09:00",
+        //             monday: "Mathematics (Mr. Johnson)",
+        //             tuesday: "English (Ms. Smith)",
+        //             wednesday: "Science (Mr. Brown)",
+        //             thursday: "Mathematics (Mr. Johnson)",
+        //             friday: "History (Ms. Davis)"
+        //         },
+        //         {
+        //             time: "09:00 - 10:00",
+        //             monday: "English (Ms. Smith)",
+        //             tuesday: "Science (Mr. Brown)",
+        //             wednesday: "Mathematics (Mr. Johnson)",
+        //             thursday: "Physical Education (Mr. Wilson)",
+        //             friday: "Science (Mr. Brown)"
+        //         },
+        //         {
+        //             time: "10:00 - 10:30",
+        //             monday: "Break",
+        //             tuesday: "Break",
+        //             wednesday: "Break",
+        //             thursday: "Break",
+        //             friday: "Break"
+        //         },
+        //         {
+        //             time: "10:30 - 11:30",
+        //             monday: "History (Ms. Davis)",
+        //             tuesday: "Mathematics (Mr. Johnson)",
+        //             wednesday: "English (Ms. Smith)",
+        //             thursday: "Science (Mr. Brown)",
+        //             friday: "Mathematics (Mr. Johnson)"
+        //         },
+        //         {
+        //             time: "11:30 - 12:30",
+        //             monday: "Science (Mr. Brown)",
+        //             tuesday: "Physical Education (Mr. Wilson)",
+        //             wednesday: "Art (Ms. Taylor)",
+        //             thursday: "English (Ms. Smith)",
+        //             friday: "Physical Education (Mr. Wilson)"
+        //         },
+        //         {
+        //             time: "12:30 - 13:30",
+        //             monday: "Lunch",
+        //             tuesday: "Lunch",
+        //             wednesday: "Lunch",
+        //             thursday: "Lunch",
+        //             friday: "Lunch"
+        //         },
+        //         {
+        //             time: "13:30 - 14:30",
+        //             monday: "Art (Ms. Taylor)",
+        //             tuesday: "History (Ms. Davis)",
+        //             wednesday: "Physical Education (Mr. Wilson)",
+        //             thursday: "Art (Ms. Taylor)",
+        //             friday: "English (Ms. Smith)"
+        //         },
+        //         {
+        //             time: "14:30 - 15:30",
+        //             monday: "Physical Education (Mr. Wilson)",
+        //             tuesday: "Art (Ms. Taylor)",
+        //             wednesday: "History (Ms. Davis)",
+        //             thursday: "History (Ms. Davis)",
+        //             friday: "Art (Ms. Taylor)"
+        //         }
+        //     ],
+        //     "class-10-b": [
+        //         // Similar structure for Class 10-B
+        //         // ...
+        //     ],
+        //     "class-11-a": [
+        //         // Similar structure for Class 11-A
+        //         // ...
+        //     ],
+        //     "class-11-b": [
+        //         // Similar structure for Class 11-B
+        //         // ...
+        //     ],
+        //     "class-12-a": [
+        //         // Similar structure for Class 12-A
+        //         // ...
+        //     ],
+        //     "class-12-b": [
+        //         // Similar structure for Class 12-B
+        //         // ...
+        //     ]
+        // };
 
         // Function to render class cards
         function renderClassCards() {
